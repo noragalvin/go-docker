@@ -1,0 +1,40 @@
+version: '3'
+services:
+  go:  
+    container_name: go_docker
+    build:
+      context: ./docker/go
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - database
+  web:
+    container_name: web_docker
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    ports:
+      - 80:80
+    depends_on:
+      - go
+  database:
+    container_name: postgres_docker
+    image: postgres:10.3
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgres
+    environment:
+        - POSTGRES_DB=gemtickets
+        - POSTGRES_USER=gem
+        - POSTGRES_PASSWORD=secret
+    ports:
+        - 54320:5432
+volumes:
+  pgdata:
